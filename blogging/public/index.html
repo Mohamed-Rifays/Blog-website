@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog App</title>
+    <style>
+        .header{
+            display: flex;
+            justify-content:space-between;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: large;
+            background-color: rgb(113, 113, 219);
+            padding: 8px 12px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+        }
+        .head-right{
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 400px;
+            padding-right: 20px;
+        }
+        .head-left{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding-left: 30px;
+        }
+        button{
+            padding: 5px 20px 5px 20px;
+            border: none;
+            border-radius: 10px;
+            background-color: rgb(203, 203, 137);
+            color: black;
+            height: 30px;
+            align-items: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .main-cards{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 150px;
+            margin-top: 100px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .each-card{
+            width: 300px;
+            border:1px solid rgba(203, 203,137);
+            border-radius: 20px;
+            padding: 20px 20px;
+            line-height: 25px;
+        }
+        .main-middle{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgb(113, 113, 219) ;
+            flex-direction: column;
+            padding-bottom: 20px;
+            margin-top: 20px;
+        }
+        .footer{
+            background-color: rgb(113, 113, 219);
+            color: black;
+            text-align: center;
+            padding: 18px 12px;
+            margin-top: 36px;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .footer a{
+            color: black;
+            text-decoration: none;
+            margin: 0 8px;
+            font-weight: 600;
+        }
+        .footer a:hover{ text-decoration: underline; }
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="head-left">Wish Blogging</div>
+
+        <!-- Dynamic header content goes here -->
+        <div class="head-right" id="nav-links"></div>
+    </header>
+
+    <main>
+        <div class="main-cards">
+            <div class="each-card">
+                <h3>Movies</h3>
+                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+                <button class="view-movies" onclick="viewCategory('movies')">view</button>
+            </div>
+            <div class="each-card">
+                <h3>Mobile</h3>
+                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+                <button class="view-mobile" onclick="viewCategory('mobile')">view</button>
+            </div>
+            <div class="each-card">
+                <h3>News</h3>
+                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+                <button class="view-news" onclick="viewCategory('news')">view</button>
+            </div>
+        </div>
+
+        <div class="main-middle">
+            <h1>Start blog to keep <br> yourself updated</h1> 
+            <button onclick="startBlog()">Start Blogging</button>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <p style="margin:6px 0 8px 0; font-weight:600">&copy; 2025 Wish Blogging</p>
+            <nav style="font-size:0.95rem">
+                <a href="#">Privacy</a>
+                <span style="color:rgba(255,255,255,0.7)">•</span>
+                <a href="#">Terms</a>
+                <span style="color:rgba(255,255,255,0.7)">•</span>
+                <a href="#">Contact</a>
+            </nav>
+            <address style="margin-top:8px; font-style:normal; color:black;">
+                <div>Phone: <a href="tel:+15551234567" style="color:black; text-decoration:none;">+1 (555) 123-4567</a></div>
+                <div>Email: <a href="mailto:contact@wishblogging.com" style="color:black; text-decoration:none;">contact@wishblogging.com</a></div>
+            </address>
+        </div>
+    </footer>
+
+    <script>
+        function updateHeader() {
+            const nav = document.getElementById('nav-links');
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                // Logged in
+                nav.innerHTML = `
+                    <p>AboutUs</p>
+                    <p>ContactUs</p>
+                    <a href="your-blogs.html"><button>view your blogs</button></a>
+                    <button id="logout-btn">Logout</button>
+                `;
+
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    const req  = fetch('/users/logout', {
+                        method: 'POST',
+                        headers: { 'Authorization': 'Bearer ' + token }
+                    });
+
+                    localStorage.removeItem('token');
+                    alert("Logged out successfully!");
+                    window.location.href = "login.html"; 
+                });
+
+            } else {
+                // Not logged in
+                nav.innerHTML = `
+                    <p>AboutUs</p>
+                    <p>ContactUs</p>
+                    <a href="signup.html"><button>SignUp</button></a>
+                    <a href="login.html"><button>Login</button></a>
+                `;
+            }
+        }
+
+        updateHeader();
+
+        function startBlog() {
+            const token = localStorage.getItem('token');
+            if (!token) {
+                alert("Login required!");
+                window.location.href = "login.html";
+                return;
+            }
+            window.location.href = "blog.html";
+}
+
+
+
+function viewCategory(category) {
+    window.location.href = `view-blog.html?category=${category}`;
+}
+
+    </script>
+
+</body>
+</html>
