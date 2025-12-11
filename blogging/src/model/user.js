@@ -2,6 +2,9 @@ import mongoose from 'mongoose';
 import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -39,7 +42,7 @@ const userSchema = new mongoose.Schema({
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
     // Here you can add code to generate a token, for example using JWT:
-     const token = jwt.sign({ _id: user._id.toString() }, 'secretkey');
+     const token = jwt.sign({ _id: user._id.toString() }, process.env.JWT_SECRET);
      user.tokens = user.tokens.concat({ token });
    
      return token;
