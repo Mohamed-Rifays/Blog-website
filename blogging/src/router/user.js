@@ -1,6 +1,9 @@
 import { Users } from "../model/user.js";
 import express from "express";
 import { auth } from "../middleware/auth.js";
+import { sendWelcomeEmail,sendCancellationEmail,sendWelcomeBackEmail } from "../emails/account.js";
+
+
 export const userrouter =new express.Router();
 
 userrouter.post('/users',async (req,res)=>{
@@ -12,6 +15,7 @@ userrouter.post('/users',async (req,res)=>{
      const token = await user.generateAuthToken();
   
         await user.save();
+        sendWelcomeEmail(user.email,user.name);
 
         res.status(201).send({ user, token });
     }catch(e){
@@ -31,6 +35,7 @@ userrouter.post('/users/login',async (req,res)=>{
         const token = await user.generateAuthToken();
 
         await user.save();
+        sendWelcomeBackEmail(user.email,user.name);
         console.log(token);
         
         res.send({user, token});
