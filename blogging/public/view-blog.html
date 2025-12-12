@@ -68,6 +68,14 @@
             const category = urlParams.get('category');
             const token = localStorage.getItem('token');
 
+            if(!token) {
+                document.getElementById('blog-category').innerHTML = `
+                    <h1>Category: ${category}</h1>
+                    <p class="no-blogs">You must be logged in to view blogs.</p>
+                `;
+                return;
+            }
+
             const req = await fetch(`/view/blogs?category=${category}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -77,6 +85,7 @@
             const res = await req.json();
 
             const container = document.getElementById('blog-category');
+            
 
             if (res.length === 0) {
                 container.innerHTML = `

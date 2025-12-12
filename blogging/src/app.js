@@ -13,9 +13,10 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
-const port = process.env.PORT || process.env.PORT;
+const port = process.env.PORT || process.env.PORT_NUMBER;
 
 await mongoose.connect(process.env.MONGO_URL);
+console.log('Connected to MongoDB');
 app.use(express.json());
 app.use(cors());
 
