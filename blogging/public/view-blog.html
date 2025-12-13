@@ -56,6 +56,16 @@
             margin-top: 40px;
             color: #777;
         }
+        .posted-on {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 20px;
+        }
+        .owner-name {
+            font-size: 0.9rem;
+            color: #888;
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 
@@ -83,6 +93,7 @@
             });
 
             const res = await req.json();
+            // const owner = res.blogOwner;
 
             const container = document.getElementById('blog-category');
             
@@ -111,8 +122,12 @@
             subLabel = "Subtitle";
         }
 
+        const date = new Date(blog.createdAt).toLocaleString();
+
         return `
             <div class="blog-card">
+                <div class="owner-name">Posted by: ${blog.owner.name}</div>
+                <div class="posted-on">Posted on: ${date}</div>
                 <h2>${blog.title}</h2>
                 <h3>${subLabel}: ${blog.subtitle}</h3>
                 <p>${blog.content}</p>

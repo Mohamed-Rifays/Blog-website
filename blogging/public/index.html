@@ -96,17 +96,17 @@
         <div class="main-cards">
             <div class="each-card">
                 <h3>Movies</h3>
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum, aperiam porro sunt ut culpa harum. Dignissimos facilis eos accusantium, et, deserunt quis, ad pariatur porro ea commodi earum distinctio ipsam? Molestias incidunt, cupiditate harum laudantium eius deleniti ratione accusamus temporibus dolorem dolor exercitationem obcaecati est, adipisci voluptates voluptatum fuga. Perferendis!</p>
                 <button class="view-movies" onclick="viewCategory('movies')">view</button>
             </div>
             <div class="each-card">
                 <h3>Mobile</h3>
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime, eius. Doloremque quibusdam adipisci voluptas aliquam, laboriosam ullam qui corrupti eaque beatae pariatur ducimus amet, dolore nobis sequi eligendi similique ipsa veniam numquam rem eius provident, facilis quo. Architecto modi quo laboriosam, unde, quos velit, soluta assumenda aspernatur ut dolor quasi!</p>
                 <button class="view-mobile" onclick="viewCategory('mobile')">view</button>
             </div>
             <div class="each-card">
                 <h3>News</h3>
-                <p>Lorem, ipsum dolor sit amet consectetur adipisicing elit...</p>
+                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea necessitatibus, non voluptatibus quo autem, provident nam distinctio numquam eaque, repudiandae harum qui consectetur. Cupiditate ea totam iure commodi deleniti optio, ducimus, esse corrupti dolores neque adipisci nam. Excepturi dicta provident accusantium ullam, nesciunt praesentium assumenda autem sunt dolorem unde quidem.</p>
                 <button class="view-news" onclick="viewCategory('news')">view</button>
             </div>
         </div>
@@ -144,12 +144,12 @@
                 nav.innerHTML = `
                     <p>AboutUs</p>
                     <p>ContactUs</p>
-                    <a href="your-blogs.html"><button>view your blogs</button></a>
+                    <a href="yourBlog.html"><button>view your blogs</button></a>
                     <button id="logout-btn">Logout</button>
                 `;
 
-                document.getElementById('logout-btn').addEventListener('click', () => {
-                    const req  = fetch('/users/logout', {
+                document.getElementById('logout-btn').addEventListener('click', async () => {
+                    const req  = await fetch('/users/logout', {
                         method: 'POST',
                         headers: { 'Authorization': 'Bearer ' + token }
                     });
@@ -168,6 +168,13 @@
                     <a href="login.html"><button>Login</button></a>
                 `;
             }
+
+                 // runs on normal load
+                document.addEventListener('DOMContentLoaded', updateHeader);
+
+                // runs when user comes back using browser back/forward buttons
+                window.addEventListener('pageshow', updateHeader);
+
         }
 
         updateHeader();

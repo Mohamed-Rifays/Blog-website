@@ -20,7 +20,7 @@ const blogSchema = new mongoose.Schema({
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true,
-        ref: 'Users'
+        ref: 'User'
     }
 
 }, { timestamps: true });

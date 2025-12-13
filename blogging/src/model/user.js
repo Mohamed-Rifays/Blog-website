@@ -3,6 +3,7 @@ import validator from 'validator';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import { Blogs } from './blog.js';
 
 dotenv.config();
 
@@ -38,6 +39,11 @@ const userSchema = new mongoose.Schema({
     }]
 }, { timestamps: true });
 
+userSchema.virtual('blogs', {
+    ref: 'Blogs',
+    localField: '_id',
+    foreignField: 'owner'
+});
 
 userSchema.methods.generateAuthToken = async function () {
     const user = this;
