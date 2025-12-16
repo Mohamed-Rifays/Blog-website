@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f4f6f8;
+      display: flex;
+    }
+
+    /* LEFT SIDEBAR */
+    .sidebar {
+      width: 240px;
+      background: #111827;
+      color: #fff;
+      padding: 30px 20px;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 30px;
+      font-size: 20px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      margin-bottom: 15px;
+      padding: 12px;
+      border: none;
+      border-radius: 6px;
+      background: #1f2933;
+      color: #fff;
+      cursor: pointer;
+      font-size: 15px;
+      text-align: left;
+    }
+
+    .sidebar button:hover {
+      background: #2563eb;
+    }
+
+    /* MAIN AREA */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    /* CENTER CARD */
+    .dashboard-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 700px;
+      border-radius: 16px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+      text-align: center;
+    }
+
+    .dashboard-card h1 {
+      font-size: 32px;
+      margin-bottom: 25px;
+    }
+
+    .profile-pic {
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin-bottom: 30px;
+      border: 4px solid #e5e7eb;
+    }
+
+    .info {
+      text-align: left;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    .info p {
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .info span {
+      font-weight: bold;
+    }
+
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+      }
+
+      .sidebar button {
+        flex: 1;
+        text-align: center;
+      }
+
+      .dashboard-card {
+        padding: 25px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <h3>Options</h3>
+    <button onclick="viewBlogs()">View your blogs</button>
+    <button onclick="editProfile()">Edit profile</button>
+    <button onclick="deleteAccount()">Delete profile</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <div class="dashboard-card">
+      <h1>Dashboard</h1>
+
+      <img
+        class="profile-pic"
+        src="https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg"
+        alt="Profile Picture"
+      />
+
+      <div class="info">
+        <p><span>Name:</span> <span id="name">Loading...</span></p>
+        <p><span>Email:</span> <span id="email">Loading...</span></p>
+        <p><span>Joined on:</span> <span id="joined">Loading...</span></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      window.location.href = '/login.html';
+    }
+
+    const fetchUser = async () => {
+      try {
+        const res = await fetch('/users/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+
+        if (!res.ok) throw new Error('Unauthorized');
+
+        const user = await res.json();
+
+        document.getElementById('name').innerText = user.name;
+        document.getElementById('email').innerText = user.email;
+        document.getElementById('joined').innerText = new Date(user.createdAt).toDateString();
+      } catch (err) {
+        localStorage.removeItem('token');
+        window.location.href = 'login.html';
+      }
+    };
+
+    fetchUser();
+
+    const viewBlogs = () => {
+      window.location.href = 'yourBlog.html';
+    };
+
+    const editProfile = () => {
+      window.location.href = 'edit-profile.html';
+    };
+
+    const deleteAccount = async () => {
+      const confirmDelete = confirm('Are you sure you want to delete your account?');
+      if (!confirmDelete) return;
+
+      await fetch('/users/me', {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      localStorage.removeItem('token');
+      window.location.href = '/signup.html';
+    };
+  </script>
+</body>
+</html>
