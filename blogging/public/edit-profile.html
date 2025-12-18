@@ -131,6 +131,7 @@
     <button onclick="goDashboard()">Dashboard</button>
     <button onclick="goBlogs()">View Blogs</button>
     <button onclick="deleteAccount()">Delete Profile</button>
+    <button onclick="goEditProfilePic()">Edit Profile Picture</button>
   </div>
 
   <!-- Main -->
@@ -221,6 +222,7 @@
 
     const goDashboard = () => window.location.href = 'dashboard.html';
     const goBlogs = () => window.location.href = 'yourBlog.html';
+    const goEditProfilePic = () => window.location.href = 'edit-profile-pic.html';
 
     const deleteAccount = async () => {
       if (!confirm('Are you sure?')) return;

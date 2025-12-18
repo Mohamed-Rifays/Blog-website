@@ -124,9 +124,11 @@
   <!-- SIDEBAR -->
   <div class="sidebar">
     <h3>Options</h3>
+    <button onclick="goHome()">Home</button>
     <button onclick="viewBlogs()">View your blogs</button>
     <button onclick="editProfile()">Edit profile</button>
     <button onclick="deleteAccount()">Delete profile</button>
+    <button onclick="goCreateBlog()">Create Blog</button>
   </div>
 
   <!-- MAIN CONTENT -->
@@ -170,6 +172,7 @@
         document.getElementById('name').innerText = user.name;
         document.getElementById('email').innerText = user.email;
         document.getElementById('joined').innerText = new Date(user.createdAt).toDateString();
+        document.querySelector('.profile-pic').src = user.avatar ? `/users/${user._id}/avatar` : document.querySelector('.profile-pic').src;
       } catch (err) {
         localStorage.removeItem('token');
         window.location.href = 'login.html';
@@ -199,6 +202,13 @@
 
       localStorage.removeItem('token');
       window.location.href = '/signup.html';
+    };
+    const goHome = () => {
+      window.location.href = 'index.html';
+    };
+
+    const goCreateBlog = () => {
+      window.location.href = 'blog.html';
     };
   </script>
 </body>

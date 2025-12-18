@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Profile Picture</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f4f6f8;
+      display: flex;
+    }
+
+    /* ---------- Sidebar (UNCHANGED) ---------- */
+    .sidebar {
+      width: 240px;
+      background: #111827;
+      color: white;
+      padding: 30px 20px;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 30px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #1f2933;
+      color: white;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .sidebar button:hover {
+      background: #2563eb;
+    }
+
+    /* ---------- Main ---------- */
+    .main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      max-width: 600px;
+      width: 100%;
+      padding: 50px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.08);
+      text-align: center;
+    }
+
+    .card h1 {
+      margin-bottom: 30px;
+    }
+
+    /* ---------- Avatar ---------- */
+    .avatar-wrapper {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 25px;
+    }
+
+    .profile-preview {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 4px solid #e5e7eb;
+    }
+
+    /* ---------- File Input Box ---------- */
+    .file-box {
+      margin: 20px auto 30px;
+      padding: 14px;
+      width: 100%;
+      max-width: 320px;
+      border: 2px dashed #cbd5e1;
+      border-radius: 10px;
+      background: #f9fafb;
+    }
+
+    .file-box input {
+      width: 100%;
+    }
+
+    /* ---------- Buttons ---------- */
+    .actions {
+      display: flex;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .actions button {
+      padding: 14px 26px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 15px;
+    }
+
+    .save {
+      background: #2563eb;
+      color: white;
+    }
+
+    .cancel {
+      background: #6b7280;
+      color: white;
+    }
+
+    /* ---------- Responsive ---------- */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+      }
+
+      .sidebar button {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>Options</h3>
+    <button onclick="goDashboard()">Dashboard</button>
+    <button onclick="goEditProfile()">Edit Profile</button>
+    <button onclick="deleteProfilePic()">Delete Profile pic</button>
+    
+  </div>
+
+  <!-- Main -->
+  <div class="main">
+    <div class="card">
+      <h1>Edit Profile Picture</h1>
+
+      <div class="avatar-wrapper">
+        <img
+          id="preview"
+          class="profile-preview"
+          src="https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg"
+          alt="Profile Picture"
+        />
+      </div>
+
+      <div class="file-box">
+        <input type="file" id="avatar" accept="image/*" />
+      </div>
+
+      <div class="actions">
+        <button class="save" onclick="uploadAvatar()">Upload</button>
+        <button class="cancel" onclick="goDashboard()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const token = localStorage.getItem('token');
+    if (!token) window.location.href = '/login.html';
+
+    async function loadUser() {
+      const res = await fetch('/users/me', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      if (res.ok) {
+        const user = await res.json();
+        // Future-ready avatar logic
+        if (user.avatar) {
+          document.getElementById('preview').src = `/users/${user._id}/avatar`;
+        }
+        else {
+          document.getElementById('preview').src = "https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg";
+        }
+
+      } else {
+        window.location.href = '/login.html';
+      }
+    }   
+    loadUser();
+    // Preview selected image
+    document.getElementById('avatar').addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        document.getElementById('preview').src = URL.createObjectURL(file);
+      }
+    });
+
+    // Upload avatar
+    const uploadAvatar = async () => {
+      const fileInput = document.getElementById('avatar');
+
+      if (!fileInput.files[0]) {
+        alert('Please select an image');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('avatar', fileInput.files[0]);
+
+      const res = await fetch('/users/me/avatar', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (res.ok) {
+        alert('Profile picture updated successfully');
+        window.location.href = '/dashboard.html';
+      } else {
+        alert('Upload failed');
+      }
+    };
+
+    const goDashboard = () => window.location.href = '/dashboard.html';
+    const goEditProfile = () => window.location.href = '/edit-profile.html';
+
+    const deleteProfilePic = async () => {
+      if (!confirm('Are you sure you want to delete your profile picture?')) return;
+
+      await fetch('/users/me/avatar', {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      loadUser();
+    };
+  </script>
+
+</body>
+</html>

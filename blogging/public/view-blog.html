@@ -1,144 +1,229 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>View Blogs</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>View Blogs</title>
 
-    <style>
-        body {
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f5f5f7;
-            margin: 0;
-            padding: 0;
-        }
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
 
-        .container {
-            max-width: 900px;
-            margin: 30px auto;
-            padding: 0 20px;
-        }
+    body {
+      min-height: 100vh;
+      background: #f5f5f7;
+    }
 
-        h1 {
-            text-align: center;
-            color: #333;
-            margin-bottom: 25px;
-        }
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
 
-        .blog-card {
-            background: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
+    .sidebar {
+      width: 240px;
+      background: #111827;
+      color: white;
+      padding: 30px 20px;
+    }
 
-        .blog-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.12);
-        }
+    .sidebar h3 {
+      margin-bottom: 30px;
+    }
 
-        .blog-card h2 {
-            margin: 0 0 10px 0;
-            color: #444;
-        }
+    .sidebar button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #1f2933;
+      color: white;
+      cursor: pointer;
+      text-align: left;
+    }
 
-        .blog-card p {
-            margin: 0;
-            color: #555;
-            line-height: 1.6rem;
-        }
+    .sidebar button:hover {
+      background: #2563eb;
+    }
 
-        .no-blogs {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-top: 40px;
-            color: #777;
-        }
-        .posted-on {
-            font-size: 0.9rem;
-            color: #888;
-            margin-bottom: 20px;
-        }
-        .owner-name {
-            font-size: 0.9rem;
-            color: #888;
-            margin-bottom: 8px;
-        }
-    </style>
+    .main {
+      flex: 1;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
+
+    .blog-card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* ✅ ADDED — avatar positioning */
+    .owner-info {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .owner-avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .owner-name,
+    .posted-on {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    .blog-card h2 {
+      margin: 10px 0;
+      color: #444;
+    }
+
+    .blog-card h3 {
+      margin-bottom: 10px;
+      color: #666;
+      font-weight: normal;
+    }
+
+    .blog-card p {
+      color: #555;
+      line-height: 1.6rem;
+    }
+
+    .no-blogs {
+      text-align: center;
+      font-size: 1.2rem;
+      margin-top: 40px;
+      color: #777;
+    }
+
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+      }
+
+      .sidebar button {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
 
 <body>
+
+<div class="layout">
+
+  <div class="sidebar">
+    <h3>Options</h3>
+    <button onclick="goHome()">Home</button>
+    <button onclick="goDashboard()">Dashboard</button>
+    <button onclick="goMyBlogs()">My Blogs</button>
+    <button onclick="goCreateBlog()">Start Blogging</button>
+  </div>
+
+  <div class="main">
     <div class="container" id="blog-category"></div>
+  </div>
 
-    <script>
-        async function loadBlogs() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const category = urlParams.get('category');
-            const token = localStorage.getItem('token');
+</div>
 
-            if(!token) {
-                document.getElementById('blog-category').innerHTML = `
-                    <h1>Category: ${category}</h1>
-                    <p class="no-blogs">You must be logged in to view blogs.</p>
-                `;
-                return;
-            }
+<script>
+async function loadBlogs() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const category = urlParams.get('category');
+  const token = localStorage.getItem('token');
+  const container = document.getElementById('blog-category');
 
-            const req = await fetch(`/view/blogs?category=${category}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+  if (!token) {
+    container.innerHTML = `
+      <h1>Category: ${category}</h1>
+      <p class="no-blogs">You must be logged in to view blogs.</p>
+    `;
+    return;
+  }
 
-            const res = await req.json();
-            // const owner = res.blogOwner;
+  const req = await fetch(`/view/blogs?category=${category}`, {
+    headers: { Authorization: `Bearer ${token}` }
+  });
 
-            const container = document.getElementById('blog-category');
-            
+  const res = await req.json();
 
-            if (res.length === 0) {
-                container.innerHTML = `
-                    <h1>Category: ${category}</h1>
-                    <p class="no-blogs">No blogs found for this category.</p>
-                `;
-                return;
-            }
+  if (res.length === 0) {
+    container.innerHTML = `
+      <h1>Category: ${category}</h1>
+      <p class="no-blogs">No blogs found for this category.</p>
+    `;
+    return;
+  }
 
-            container.innerHTML = `
+  container.innerHTML = `
     <h1>Viewing Blogs in "${category}"</h1>
     ${res.map(blog => {
 
-        let subLabel = "";
+      const avatar = blog.owner.avatar
+        ? `/users/${blog.owner._id}/avatar`
+        : 'https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg';
 
-        if (blog.title.toLowerCase() === "movies") {
-            subLabel = "Movie Title";
-        } else if (blog.title.toLowerCase() === "news") {
-            subLabel = "News Title";
-        } else if (blog.title.toLowerCase() === "mobile") {
-            subLabel = "Mobile Title";
-        } else {
-            subLabel = "Subtitle";
-        }
+      return `
+        <div class="blog-card">
 
-        const date = new Date(blog.createdAt).toLocaleString();
-
-        return `
-            <div class="blog-card">
-                <div class="owner-name">Posted by: ${blog.owner.name}</div>
-                <div class="posted-on">Posted on: ${date}</div>
-                <h2>${blog.title}</h2>
-                <h3>${subLabel}: ${blog.subtitle}</h3>
-                <p>${blog.content}</p>
+          <!-- ✅ ONLY STRUCTURE CHANGE -->
+          <div class="owner-info">
+            <img class="owner-avatar" src="${avatar}">
+            <div>
+              <div class="owner-name">Posted by: ${blog.owner.name}</div>
+              <div class="posted-on">
+                Posted on: ${new Date(blog.createdAt).toLocaleString()}
+              </div>
             </div>
-        `;
+          </div>
+
+          <h2>${blog.title}</h2>
+          <h3>${blog.subtitle}</h3>
+          <p>${blog.content}</p>
+
+        </div>
+      `;
     }).join('')}
-`;
+  `;
+}
 
-        }
+const goDashboard = () => location.href = 'dashboard.html';
+const goMyBlogs = () => location.href = 'yourBlog.html';
+const goHome = () => location.href = 'index.html';
+const goCreateBlog = () => location.href = 'blog.html';
 
-        loadBlogs();
-    </script>
+loadBlogs();
+</script>
+
 </body>
 </html>

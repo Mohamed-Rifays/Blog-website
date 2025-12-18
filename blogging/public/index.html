@@ -17,6 +17,11 @@
             top: 0;
             z-index: 1000;
             box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+            border-radius: 0 0 0 0;           /* keep edges flush */
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+            overflow: hidden;
+
         }
         .head-right{
             display: flex;
@@ -25,6 +30,7 @@
             width: 500px;
             padding-right: 20px;
         }
+        
         .head-left{
             display: flex;
             justify-content: center;
@@ -48,7 +54,7 @@
             align-items: center;
             justify-content: center;
             gap: 150px;
-            margin-top: 100px;
+            margin-top: 60px;
             font-family: Arial, Helvetica, sans-serif;
         }
         .each-card{
@@ -82,6 +88,19 @@
             font-weight: 600;
         }
         .footer a:hover{ text-decoration: underline; }
+        .search-box-container{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 50px;
+        }
+        .search-box{
+            width: 50%;
+            height: 30px;
+            border-radius: 15px;
+            padding-left: 20px;
+            border: 1px solid rgba(203, 203,137);
+        }
     </style>
 </head>
 <body>
@@ -94,10 +113,15 @@
     </header>
 
     <main>
+        <div class="search-box-container"><input class="search-box" id="searchInput" type="text" placeholder="Search by category...">
+</div>
+ <p id="no-results" style="display:none; text-align:center; margin-top:20px; color:#777;">
+  No blogs in this category
+</p>
         <div class="main-cards">
             <div class="each-card">
                 <h3>Movies</h3>
-                <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Illum, aperiam porro sunt ut culpa harum. Dignissimos facilis eos accusantium, et, deserunt quis, ad pariatur porro ea commodi earum distinctio ipsam? Molestias incidunt, cupiditate harum laudantium eius deleniti ratione accusamus temporibus dolorem dolor exercitationem obcaecati est, adipisci voluptates voluptatum fuga. Perferendis!</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime, eius. Doloremque quibusdam adipisci voluptas aliquam, laboriosam ullam qui corrupti eaque beatae pariatur ducimus amet, dolore nobis sequi eligendi similique ipsa veniam numquam rem eius provident, facilis quo. Architecto modi quo laboriosam, unde, quos velit, soluta assumenda aspernatur ut dolor quasi!</p>
                 <button class="view-movies" onclick="viewCategory('movies')">view</button>
             </div>
             <div class="each-card">
@@ -107,7 +131,7 @@
             </div>
             <div class="each-card">
                 <h3>News</h3>
-                <p>Lorem ipsum dolor sit, amet consectetur adipisicing elit. Ea necessitatibus, non voluptatibus quo autem, provident nam distinctio numquam eaque, repudiandae harum qui consectetur. Cupiditate ea totam iure commodi deleniti optio, ducimus, esse corrupti dolores neque adipisci nam. Excepturi dicta provident accusantium ullam, nesciunt praesentium assumenda autem sunt dolorem unde quidem.</p>
+                <p>Lorem ipsum dolor, sit amet consectetur adipisicing elit. Maxime, eius. Doloremque quibusdam adipisci voluptas aliquam, laboriosam ullam qui corrupti eaque beatae pariatur ducimus amet, dolore nobis sequi eligendi similique ipsa veniam numquam rem eius provident, facilis quo. Architecto modi quo laboriosam, unde, quos velit, soluta assumenda aspernatur ut dolor quasi!</p>
                 <button class="view-news" onclick="viewCategory('news')">view</button>
             </div>
         </div>
@@ -117,6 +141,9 @@
             <button onclick="startBlog()">Start Blogging</button>
         </div>
     </main>
+
+   
+
 
     <footer class="footer">
         <div class="footer-inner">
@@ -136,7 +163,7 @@
     </footer>
 
     <script>
-        function updateHeader() {
+         async function updateHeader() {
             const nav = document.getElementById('nav-links');
             const token = localStorage.getItem('token');
 
@@ -147,7 +174,7 @@
                     <p>ContactUs</p>
                     <a href="yourBlog.html"><button>view your blogs</button></a>
                     <button id="logout-btn">Logout</button>
-                    <a href="dashboard.html"><img src="https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg" alt="Avatar" style="width:30px; height:30px; border-radius:50%;"></a>
+                    <a href="dashboard.html"><img class="profile-pic" src="https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg" alt="Avatar" style="width:40px; height:40px; border-radius:50%;"></a>
                 `;
 
                 document.getElementById('logout-btn').addEventListener('click', async () => {
@@ -171,6 +198,20 @@
                 `;
             }
 
+            const profile = await fetch('/users/me', {
+              headers: { Authorization: `Bearer ${token}` } 
+            });
+            const user = await profile.json();
+
+            if(user.avatar){
+              document.querySelector('.head-right img').src = `/users/${user._id}/avatar`;
+            }
+            else{
+                document.querySelector('.head-right img').src = 'https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg';
+            }
+
+
+
                  // runs on normal load
                 document.addEventListener('DOMContentLoaded', updateHeader);
 
@@ -191,11 +232,40 @@
             window.location.href = "blog.html";
 }
 
+        function viewCategory(category) {
+            window.location.href = `view-blog.html?category=${category}`;
+        }
+
+        const searchInput = document.getElementById('searchInput');
+        const cards = document.querySelectorAll('.each-card');
+        const noResults = document.getElementById('no-results');
+
+        
+
+        searchInput.addEventListener('input', () => {
+        const searchValue = searchInput.value.toLowerCase().trim();
+        let visibleCount = 0;
+
+        cards.forEach(card => {
+            const title = card.querySelector('h3').textContent.toLowerCase();
+
+            if (title.includes(searchValue)) {
+                card.style.display = 'block';
+                visibleCount++;
+            } else{
+                card.style.display = 'none';
+            }
+
+            if(visibleCount===0){
+             noResults.style.display='block';
+            }
+            else{
+                noResults.style.display='none';
+            }
+    });
+});
 
 
-function viewCategory(category) {
-    window.location.href = `view-blog.html?category=${category}`;
-}
 
     </script>
 

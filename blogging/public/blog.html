@@ -1,83 +1,251 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Blog Post</title>
-    <style>
-        html,body{height:100%;margin:0;font-family:Arial, Helvetica, sans-serif;background:#f7f8fb}
-        .header{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgb(113,113,219);color:black}
-        .container{max-width:900px;margin:36px auto;padding:0 16px;box-sizing:border-box}
-        .post-form{background:white;padding:24px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
-        .form-group{display:flex;flex-direction:column;margin-bottom:14px}
-        label{margin-bottom:6px;font-weight:600}
-        input[type="text"]{padding:10px;border:1px solid rgba(0,0,0,0.12);border-radius:4px;font-size:1rem}
-        textarea{min-height:260px;padding:10px;border:1px solid rgba(0,0,0,0.12);border-radius:4px;font-size:1rem;resize:vertical}
-        .submit-btn{background:#0b62d6;color:white;border:none;padding:10px 14px;border-radius:6px;cursor:pointer;font-size:1rem}
-        .submit-btn:hover{background:#0954b1}
-        .muted{color:#6b6f77;font-size:0.95rem;margin-top:8px}
-        footer{margin-top:28px;text-align:center;color:#6b6f77;font-size:0.95rem}
-        a.back{color:black;text-decoration:none;font-weight:700}
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>New Blog Post</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: #f7f8fb;
+    }
+
+    /* ===== Layout ===== */
+    .layout {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    /* ===== Sidebar ===== */
+    .sidebar {
+      width: 240px;
+      background: #111827;
+      color: white;
+      padding: 30px 20px;
+    }
+
+    .sidebar h3 {
+      margin-bottom: 30px;
+    }
+
+    .sidebar button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: none;
+      border-radius: 6px;
+      background: #1f2933;
+      color: white;
+      cursor: pointer;
+      text-align: left;
+    }
+
+    .sidebar button:hover {
+      background: #2563eb;
+    }
+
+    /* ===== Main ===== */
+    .main {
+      flex: 1;
+      padding: 30px 20px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+    }
+
+    .post-form {
+      background: white;
+      padding: 24px;
+      border-radius: 10px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.06);
+    }
+
+    .post-form h2 {
+      margin-bottom: 20px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      margin-bottom: 14px;
+    }
+
+    label {
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    input[type="text"],
+    textarea {
+      padding: 10px;
+      border: 1px solid rgba(0,0,0,0.12);
+      border-radius: 6px;
+      font-size: 1rem;
+    }
+
+    textarea {
+      min-height: 260px;
+      resize: vertical;
+    }
+
+    .submit-btn {
+      background: #0b62d6;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: bold;
+    }
+
+    .submit-btn:hover {
+      background: #0954b1;
+    }
+
+    .muted {
+      color: #6b6f77;
+      font-size: 0.95rem;
+      margin-top: 10px;
+    }
+
+    footer {
+      margin-top: 28px;
+      text-align: center;
+      color: #6b6f77;
+      font-size: 0.95rem;
+    }
+
+    /* ===== Responsive ===== */
+    @media (max-width: 768px) {
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+      }
+
+      .sidebar button {
+        flex: 1;
+        text-align: center;
+      }
+    }
+  </style>
 </head>
+
 <body>
-    <header class="header">
-        <div>Wish Blogging</div>
-        <div><a class="back" href="index.html">Home</a></div>
-    </header>
 
-    <main class="container">
-        <section class="post-form">
-            <h2>Create a new post</h2>
-            <form class="blog-form">
-                <div class="form-group">
-                    <label for="post-title">Heading</label>
-                    <input id="post-title" name="title" type="text" placeholder="Enter your post title" required>
-                </div>
+<div class="layout">
 
-                <div class="form-group">
-                    <label for="post-subtitle">Title of the content</label>
-                    <input id="post-subtitle" name="subtitle" type="text" placeholder="Enter your content title" required>
-                </div>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h3>Options</h3>
+    <button onclick="goHome()">Home</button>
+    <button onclick="goDashboard()">Dashboard</button>
+    <button onclick="goMyBlogs()">My Blogs</button>
+  </div>
 
-                <div class="form-group">
-                    <label for="post-body">Content</label>
-                    <textarea id="post-body" name="content" placeholder="Write your blog content here..." required></textarea>
-                </div>
+  <!-- Main -->
+  <div class="main">
+    <div class="container">
+      <section class="post-form">
+        <h2>Create a new post</h2>
 
-                <button type="submit" class="submit-btn">Submit</button>
-                <div class="muted">Your post will be submitted when you press Submit.</div>
-            </form>
-        </section>
-        <footer>
-            &copy; 2025 Wish Blogging
-        </footer>
-    </main>
+        <form class="blog-form">
+          <div class="form-group">
+            <label for="post-title">Heading</label>
+            <input id="post-title" name="title" type="text" placeholder="Enter your post title" required>
+          </div>
 
-    <script>
-        document.querySelector('.blog-form').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const title = document.getElementById('post-title').value;
-            const content = document.getElementById('post-body').value;
-            const subtitle = document.getElementById('post-subtitle').value;
-           
-            // Here you would typically send the data to the backend server
-               const token = localStorage.getItem('token');
+          <div class="form-group">
+            <label for="post-subtitle">Title of the content</label>
+            <input id="post-subtitle" name="subtitle" type="text" placeholder="Enter your content title" required>
+          </div>
 
-            const req = await fetch('/blogs', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + token
-                },
-                body: JSON.stringify({ title, content, subtitle })
-            }); 
+          <div class="form-group">
+            <label for="post-body">Content</label>
+            <textarea id="post-body" name="content" placeholder="Write your blog content here..." required></textarea>
+          </div>
 
-            const res = await req.json();
-             alert('Blog post submitted!\n\nTitle: ' + res.title + '\nMovie: ' + res.subtitle + '\nContent: ' + res.content);
-            
-            e.target.reset();
-        });
-    </script>
+          <button type="submit" class="submit-btn">Submit</button>
+          <div class="muted">Your post will be submitted when you press Submit.</div>
+        </form>
+      </section>
+
+      <footer>
+        &copy; 2025 Wish Blogging
+      </footer>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  document.querySelector('.blog-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const title = document.getElementById('post-title').value;
+    const subtitle = document.getElementById('post-subtitle').value;
+    const content = document.getElementById('post-body').value;
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert('Please login first');
+      return;
+    }
+
+    const req = await fetch('/blogs', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ title, subtitle, content })
+    });
+
+    const res = await req.json();
+
+    alert(
+      'Blog post submitted!\n\n' +
+      'Title: ' + res.title +
+      '\nSubtitle: ' + res.subtitle
+    );
+
+    e.target.reset();
+  });
+
+  /* Sidebar navigation */
+  const goDashboard = () => location.href = 'dashboard.html';
+  const goMyBlogs = () => location.href = 'yourBlog.html';
+    const goHome = () => {
+        window.location.href = 'index.html';
+    };
+
+  const deleteAccount = async () => {
+    if (!confirm('Are you sure?')) return;
+    const token = localStorage.getItem('token');
+    await fetch('/users/me', {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    localStorage.removeItem('token');
+    location.href = 'signup.html';
+  };
+</script>
+
 </body>
 </html>
