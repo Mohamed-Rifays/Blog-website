@@ -28,13 +28,22 @@ blogrouter.post('/blogs', auth, async (req, res) => {
 
 blogrouter.get('/view/blogs', auth , async (req, res) => {
     console.log('hi');
+
+    const sort = req.query.sort;
+
+  const sortObj = sort === 'oldest'
+    ? { createdAt: 1 }
+    : { createdAt: -1 };
     
     try {
     const blogs = await Blogs
     .find({title: req.query.category })
-     .populate('owner');   
+    .sort(sortObj)
+    .limit(parseInt(req.query.limit))
+    .skip(parseInt(req.query.skip))
+    .populate('owner');   
 
-        console.log(blogs);
+       
   
         res.send(blogs);
     } catch (e) {
@@ -46,8 +55,21 @@ blogrouter.get('/view/blogs', auth , async (req, res) => {
 
 blogrouter.get('/blogs/me', auth, async (req, res) => {
     try {
+        const sort = req.query.sort;
+        const limit = parseInt(req.query.limit);
+        const skip = parseInt(req.query.skip);
+        const sortObj = sort === 'oldest'
+            ? { createdAt: 1 }
+            : { createdAt: -1 };
+
         const user = req.user;
-        await user.populate('blogs');
+        await user.populate({
+            path:'blogs',
+            options:{
+            sort: sortObj,
+            limit,
+            skip
+        }});
         res.send(user.blogs);
     } catch (e) {
         res.status(500).send();

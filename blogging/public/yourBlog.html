@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Blogs</title>
 
   <style>
@@ -18,7 +18,6 @@
       background: #f5f5f7;
     }
 
-    /* ===== Layout ===== */
     .layout {
       display: flex;
       min-height: 100vh;
@@ -52,7 +51,7 @@
       background: #2563eb;
     }
 
-    /* ===== Main Content ===== */
+    /* ===== Main ===== */
     .main {
       flex: 1;
       padding: 30px 20px;
@@ -65,28 +64,28 @@
 
     h1 {
       text-align: center;
-      color: #333;
       margin-bottom: 25px;
     }
 
+    /* ===== Blog Card ===== */
     .blog-card {
-      background: white;
-      padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      background: #ffffff;
+      padding: 24px 28px;
+      border-radius: 14px;
+      margin-bottom: 24px;
+      box-shadow: 0 6px 14px rgba(0,0,0,0.06);
     }
 
     .blog-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 12px;
+      margin-bottom: 16px;
     }
 
     .posted-on {
-      font-size: 0.9rem;
-      color: #888;
+      font-size: 14px;
+      color: #6b7280;
     }
 
     .action-buttons {
@@ -94,49 +93,50 @@
       gap: 10px;
     }
 
+    .edit-btn,
     .delete-btn {
-      background: #ff4d4d;
       border: none;
       color: white;
       padding: 6px 12px;
       border-radius: 6px;
       cursor: pointer;
       font-size: 0.85rem;
-    }
-
-    .delete-btn:hover {
-      background: #e60000;
     }
 
     .edit-btn {
       background: #4a90e2;
-      border: none;
-      color: white;
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-size: 0.85rem;
     }
 
     .edit-btn:hover {
       background: #357ab8;
     }
 
+    .delete-btn {
+      background: #ff4d4d;
+    }
+
+    .delete-btn:hover {
+      background: #e60000;
+    }
+
     .blog-card h2 {
-      margin: 5px 0;
-      color: #444;
+      font-size: 22px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 8px;
     }
 
     .blog-card h3 {
-      margin: 0 0 10px 0;
-      color: #666;
-      font-weight: normal;
+      font-size: 16px;
+      font-weight: 500;
+      color: #374151;
+      margin-bottom: 14px;
     }
 
     .blog-card p {
-      margin: 0;
-      color: #555;
-      line-height: 1.6rem;
+      font-size: 15px;
+      color: #4b5563;
+      line-height: 1.7;
     }
 
     .no-blogs {
@@ -146,175 +146,230 @@
       color: #777;
     }
 
-    /* ===== Responsive ===== */
-    @media (max-width: 768px) {
-      .layout {
-        flex-direction: column;
-      }
+    .loading {
+      text-align: center;
+      margin-top: 200px;
+      font-size: 40px;
+    }
 
-      .sidebar {
-        width: 100%;
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-      }
+    /* ===== Pagination ===== */
+    #pagination {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
 
-      .sidebar button {
-        flex: 1;
-        text-align: center;
-      }
+    #pagination button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    #pagination button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
     }
   </style>
 </head>
 
 <body>
+<div class="layout">
 
-  <div class="layout">
+  <div class="sidebar">
+    <h3>Options</h3>
+    <button onclick="goHome()">Home</button>
+    <button onclick="goDashboard()">Dashboard</button>
+    <button onclick="goEditProfile()">Edit Profile</button>
+    <button onclick="goCreateBlog()">Create Blog</button>
+  </div>
 
-    <!-- Sidebar -->
-    <div class="sidebar">
-      <h3>Options</h3>
-      <button onclick="goHome()">Home</button>
-      <button onclick="goDashboard()">Dashboard</button>
-      <button onclick="goEditProfile()">Edit Profile</button>
+  <div class="main">
+
+    <!-- Sort -->
+    <div style="max-width:900px; margin:0 auto 20px; display:flex; justify-content:flex-end; gap:10px;">
+      <label for="sort"><b>Sort by</b></label>
+      <select id="sort">
+        <option value="latest">Latest first</option>
+        <option value="oldest">Oldest first</option>
+      </select>
     </div>
 
-    <!-- Main -->
-    <div class="main">
-      <div class="container" id="my-blogs"></div>
+    <div class="container" id="my-blogs"></div>
+
+    <!-- Pagination -->
+    <div id="pagination">
+      <button id="prevBtn">Prev</button>
+      <span id="pageInfo"></span>
+      <button id="nextBtn">Next</button>
     </div>
 
   </div>
+</div>
 
-  <script>
-    async function loadMyBlogs() {
-      const container = document.getElementById('my-blogs');
-      const token = localStorage.getItem('token');
+<script>
+  const sorting = document.getElementById('sort');
+  const container = document.getElementById('my-blogs');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const pageInfo = document.getElementById('pageInfo');
 
-      if (!token) {
-        container.innerHTML = `
-          <h1>My Blogs</h1>
-          <p class="no-blogs">You must be logged in to view your blogs.</p>
-        `;
-        return;
-      }
+  let currentPage = 1;
+  const limit = 5;
 
-      try {
-        const req = await fetch('/blogs/me', {
-          headers: { Authorization: `Bearer ${token}` }
-        });
+  async function loadMyBlogs() {
+    const token = localStorage.getItem('token');
+    const sort = sorting.value;
+    const skip = (currentPage - 1) * limit;
 
-        const blogs = await req.json();
-
-        if (!blogs.length) {
-          container.innerHTML = `
-            <h1>My Blogs</h1>
-            <p class="no-blogs">You haven’t created any blogs yet.</p>
-          `;
-          return;
-        }
-
-        container.innerHTML = `
-          <h1>My Blogs</h1>
-          ${blogs.map(blog => {
-            const date = new Date(blog.createdAt).toLocaleString();
-
-            return `
-              <div class="blog-card">
-                <div class="blog-header">
-                  <div class="posted-on">Posted on: ${date}</div>
-                  <div class="action-buttons">
-                    <button class="edit-btn"
-                      onclick="editBlog(
-                        '${blog._id}',
-                        '${escapeHtml(blog.title)}',
-                        '${escapeHtml(blog.subtitle)}',
-                        '${escapeHtml(blog.content)}'
-                      )">Edit</button>
-
-                    <button class="delete-btn"
-                      onclick="deleteBlog('${blog._id}')">Delete</button>
-                  </div>
-                </div>
-
-                <h2>${blog.title}</h2>
-                <h3>${blog.subtitle}</h3>
-                <p>${blog.content}</p>
-              </div>
-            `;
-          }).join('')}
-        `;
-
-      } catch {
-        container.innerHTML = `
-          <h1>My Blogs</h1>
-          <p class="no-blogs">Failed to load blogs.</p>
-        `;
-      }
+    if (!token) {
+      container.innerHTML = `<p class="no-blogs">Login required</p>`;
+      return;
     }
 
-    async function deleteBlog(id) {
-      const token = localStorage.getItem('token');
-      if (!confirm('Delete this blog?')) return;
+    container.innerHTML = `<p class="loading">Loading...</p>`;
 
-      const res = await fetch(`/blogs/${id}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
+    const res = await fetch(
+      `/blogs/me?sort=${sort}&limit=${limit}&skip=${skip}`,
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
 
-      if (res.ok) loadMyBlogs();
-      else alert('Delete failed');
+    const blogs = await res.json();
+
+    if (!blogs.length && currentPage === 1) {
+      container.innerHTML = `<p class="no-blogs">No blogs yet</p>`;
+      return;
     }
 
-    async function editBlog(id, t, s, c) {
-      const title = prompt('Edit title', t);
-      const subtitle = prompt('Edit subtitle', s);
-      const content = prompt('Edit content', c);
-      if (!title || !subtitle || !content) return;
+    container.innerHTML = `
+      <h1>My Blogs</h1>
+      ${blogs.map(blog => `
+        <div class="blog-card">
+          <div class="blog-header">
+            <div class="posted-on">
+              Posted on ${new Date(blog.createdAt).toLocaleString()}
+            </div>
 
-      const token = localStorage.getItem('token');
+            <div class="action-buttons">
+              <button class="edit-btn"
+                onclick="editBlog(
+                  '${blog._id}',
+                  '${escapeHtml(blog.title)}',
+                  '${escapeHtml(blog.subtitle)}',
+                  '${escapeHtml(blog.content)}'
+                )">
+                Edit
+              </button>
 
-      const res = await fetch(`/blogs/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ title, subtitle, content })
-      });
+              <button class="delete-btn"
+                onclick="deleteBlog('${blog._id}')">
+                Delete
+              </button>
+            </div>
+          </div>
 
-      if (res.ok) loadMyBlogs();
-      else alert('Update failed');
+          <h2>${blog.title}</h2>
+          <h3>${blog.subtitle}</h3>
+          <p>${blog.content}</p>
+        </div>
+      `).join('')}
+    `;
+
+    pageInfo.textContent = `Page ${currentPage}`;
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = blogs.length < limit;
+  }
+
+  async function deleteBlog(id) {
+    const token = localStorage.getItem('token');
+    if (!confirm('Delete this blog?')) return;
+
+    const res = await fetch(`/blogs/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    if (res.ok) loadMyBlogs();
+    else alert('Delete failed');
+  }
+
+  async function editBlog(id, t, s, c) {
+    const title = prompt('Edit title', t);
+    const subtitle = prompt('Edit subtitle', s);
+    const content = prompt('Edit content', c);
+    if (!title || !subtitle || !content) return;
+
+    const token = localStorage.getItem('token');
+
+    const res = await fetch(`/blogs/${id}`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ title, subtitle, content })
+    });
+
+    if (res.ok) loadMyBlogs();
+    else alert('Update failed');
+  }
+
+  function escapeHtml(text) {
+    return text
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#039;");
+  }
+
+  prevBtn.onclick = () => {
+    if (currentPage > 1) {
+      currentPage--;
+      loadMyBlogs();
     }
+  };
 
-    function escapeHtml(text) {
-      return text
-        .replace(/&/g, "&amp;")
-        .replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;")
-        .replace(/"/g, "&quot;")
-        .replace(/'/g, "&#039;");
-    }
-
-    /* Sidebar navigation */
-    const goDashboard = () => location.href = 'dashboard.html';
-    const goEditProfile = () => location.href = 'edit-profile.html';
-    const goHome = () => location.href = 'index.html';
-   
-
-    const deleteAccount = async () => {
-      if (!confirm('Are you sure?')) return;
-      const token = localStorage.getItem('token');
-      await fetch('/users/me', {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` }
-      });
-      localStorage.removeItem('token');
-      location.href = 'signup.html';
-    };
-
+  nextBtn.onclick = () => {
+    currentPage++;
     loadMyBlogs();
-  </script>
+  };
 
+  sorting.addEventListener('change', () => {
+    currentPage = 1;
+    loadMyBlogs();
+  });
+
+  const goHome = () => location.href = 'index.html';
+  const goDashboard = () => location.href = 'dashboard.html';
+  const goEditProfile = () => location.href = 'edit-profile.html';
+  const goCreateBlog = () => location.href = 'blog.html';
+
+  loadMyBlogs();
+</script>
+<!-- /*Examples:
+Page 1
+skip = (1 - 1) * 5 = 0
+
+
+ Skip nothing → give first 5 blogs
+
+Page 2
+skip = (2 - 1) * 5 = 5
+
+
+ Skip first 5 → give next 5 blogs
+
+Page 3
+skip = (3 - 1) * 5 = 10
+
+
+ Skip first 10 → give next 5 blogs
+
+ This is the heart of pagination
+*/ -->
 </body>
 </html>

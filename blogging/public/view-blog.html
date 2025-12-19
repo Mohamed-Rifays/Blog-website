@@ -117,6 +117,35 @@
       margin-top: 40px;
       color: #777;
     }
+    .loading{
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       margin-right: 50px;
+       margin-top: 200px;
+       font-family: Arial, Helvetica, sans-serif;
+       font-size: 50px;
+      }
+       #pagination {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    #pagination button {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #2563eb;
+      color: white;
+    }
+
+    #pagination button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+    }
 
     @media (max-width: 768px) {
       .layout {
@@ -134,7 +163,9 @@
         flex: 1;
         text-align: center;
       }
+      
     }
+
   </style>
 </head>
 
@@ -151,17 +182,40 @@
   </div>
 
   <div class="main">
+   <div style="max-width:900px; margin:0 auto 20px auto; display:flex; justify-content:flex-end; gap:10px; align-items:center;">
+    <label for="sort" style="font-weight:600;">Sort by</label>
+    <select id="sort">
+      <option value="latest">Latest first</option>
+      <option value="oldest">Oldest first</option>
+    </select>
+  </div>
     <div class="container" id="blog-category"></div>
+     <!-- Pagination -->
+    <div id="pagination">
+      <button id="prevBtn">Prev</button>
+      <span id="pageInfo"></span>
+      <button id="nextBtn">Next</button>
+    </div>
   </div>
 
 </div>
 
 <script>
+const sorting = document.getElementById('sort');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const pageInfo = document.getElementById('pageInfo');
+
+let currentPage = 1;
+const limit = 5;
+
 async function loadBlogs() {
   const urlParams = new URLSearchParams(window.location.search);
   const category = urlParams.get('category');
   const token = localStorage.getItem('token');
   const container = document.getElementById('blog-category');
+  const sort = sorting.value;
+  const skip = (currentPage - 1)*limit;
 
   if (!token) {
     container.innerHTML = `
@@ -171,59 +225,92 @@ async function loadBlogs() {
     return;
   }
 
-  const req = await fetch(`/view/blogs?category=${category}`, {
-    headers: { Authorization: `Bearer ${token}` }
-  });
+  
+    container.innerHTML=`<p class="loading">Loading...</p>`;
 
-  const res = await req.json();
 
-  if (res.length === 0) {
+  const req = await fetch(
+    `/view/blogs?category=${category}&sort=${sort}&limit=${limit}&skip=${skip}`,
+    { headers: { Authorization: `Bearer ${token}` } }
+  );
+
+  const blogs = await req.json();
+
+  if (blogs.length === 0 && currentPage===1 ) {
     container.innerHTML = `
       <h1>Category: ${category}</h1>
-      <p class="no-blogs">No blogs found for this category.</p>
+      <p class="no-blogs">No blogs found.</p>
     `;
     return;
   }
 
+
   container.innerHTML = `
     <h1>Viewing Blogs in "${category}"</h1>
-    ${res.map(blog => {
-
-      const avatar = blog.owner.avatar
-        ? `/users/${blog.owner._id}/avatar`
-        : 'https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg';
-
-      return `
-        <div class="blog-card">
-
-          <!-- ✅ ONLY STRUCTURE CHANGE -->
-          <div class="owner-info">
-            <img class="owner-avatar" src="${avatar}">
-            <div>
-              <div class="owner-name">Posted by: ${blog.owner.name}</div>
-              <div class="posted-on">
-                Posted on: ${new Date(blog.createdAt).toLocaleString()}
-              </div>
+    ${blogs.map(blog => `
+      <div class="blog-card">
+        <div class="owner-info">
+          <img class="owner-avatar" src="${
+            blog.owner.avatar
+              ? `/users/${blog.owner._id}/avatar`
+              : 'https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg'
+          }">
+          <div>
+            <div class="owner-name">Posted by: ${blog.owner.name}</div>
+            <div class="posted-on">
+              ${new Date(blog.createdAt).toLocaleString()}
             </div>
           </div>
-
-          <h2>${blog.title}</h2>
-          <h3>${blog.subtitle}</h3>
-          <p>${blog.content}</p>
-
         </div>
-      `;
-    }).join('')}
+        <h2>${blog.title}</h2>
+        <h3>${blog.subtitle}</h3>
+        <p>${blog.content}</p>
+      </div>
+    `).join('')}
   `;
+    pageInfo.textContent = `Page ${currentPage}`;
+    prevBtn.disabled = currentPage === 1;
+    nextBtn.disabled = blogs.length < limit;
 }
 
-const goDashboard = () => location.href = 'dashboard.html';
-const goMyBlogs = () => location.href = 'yourBlog.html';
-const goHome = () => location.href = 'index.html';
-const goCreateBlog = () => location.href = 'blog.html';
+prevBtn.addEventListener('click',()=>{
+  currentPage--;
+  loadBlogs();
+})
 
+nextBtn.addEventListener('click',()=>{
+  currentPage++;
+  loadBlogs();
+})
+
+/* ✅ Attach once */
+sorting.addEventListener('change',()=>{
+
+currentPage =1;
+loadBlogs()});
+
+/* ✅ Initial load */
 loadBlogs();
+
+function goMyBlogs(){
+  window.location.href = 'yourBlog.html';
+}
+
+function goHome(){
+  window.location.href = 'index.html';
+}
+
+function goDashboard(){
+  window.location.href = 'dashboard.html';
+}
+
+function goCreateBlog(){
+  window.location.href = 'blog.html';
+}
 </script>
+<!-- Event listeners should trigger behavior, not contain business logic. -->
+
+
 
 </body>
 </html>
