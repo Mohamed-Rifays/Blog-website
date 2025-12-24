@@ -7,16 +7,12 @@ import { Users } from "../model/user.js";
 export const blogrouter = new express.Router();
 
 blogrouter.post('/blogs', auth, async (req, res) => {
-    console.log('hi');
-
-    console.log(req.body);
     
     
     const blog = new Blogs({
         ...req.body,
         owner: req.user._id
     });
-    console.log(blog);
     
     try {
         await blog.save();
@@ -27,7 +23,6 @@ blogrouter.post('/blogs', auth, async (req, res) => {
 });
 
 blogrouter.get('/view/blogs', auth , async (req, res) => {
-    console.log('hi');
 
     const sort = req.query.sort;
 

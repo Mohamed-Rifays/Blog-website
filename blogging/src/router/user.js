@@ -58,7 +58,7 @@ userrouter.post('/users',async (req,res)=>{
      const token = await user.generateAuthToken();
   
         await user.save();
-        // sendWelcomeEmail(user.email,user.name);
+         sendWelcomeEmail(user.email,user.name);
 
         res.status(201).send({ user, token });
     }catch(e){
@@ -70,16 +70,13 @@ userrouter.post('/users',async (req,res)=>{
 
 userrouter.post('/users/login',async (req,res)=>{
     try{
-        console.log('hi');
         
         const user = await Users.findByCredentials(req.body.email, req.body.password);
-        console.log(user);
         
         const token = await user.generateAuthToken();
 
         await user.save();
-        // sendWelcomeBackEmail(user.email,user.name);
-        console.log(token);
+         sendWelcomeBackEmail(user.email,user.name);
         
         res.send({user, token});
     }catch(e){ 
@@ -128,7 +125,7 @@ userrouter.patch('/users/me',auth, async (req,res)=>{
 userrouter.delete('/users/me',auth, async (req,res)=>{
     try{
         await req.user.remove();
-        // sendCancellationEmail(req.user.email,req.user.name);
+         sendCancellationEmail(req.user.email,req.user.name);
         res.send(req.user);
     }catch(e){
         res.status(500).send();
