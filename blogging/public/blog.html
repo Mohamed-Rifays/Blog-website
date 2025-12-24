@@ -196,16 +196,19 @@
 
 <script>
    const token = localStorage.getItem('token');
-
-    if (!token) {
+   if (!token) {
       window.location.href='login.html';
+      
     }
+
+    
   document.querySelector('.blog-form').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const title = document.getElementById('post-title').value;
     const subtitle = document.getElementById('post-subtitle').value;
     const content = document.getElementById('post-body').value;
+    
    
 
     const req = await fetch('/blogs', {

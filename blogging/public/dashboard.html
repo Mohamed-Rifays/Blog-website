@@ -151,14 +151,17 @@
   </div>
 
   <script>
-    const token = localStorage.getItem('token');
+    
+   
+   
+    const fetchUser = async () => {
+      try {
+        const token = localStorage.getItem('token');
 
     if (!token) {
       window.location.href = 'login.html';
+      return;
     }
-
-    const fetchUser = async () => {
-      try {
         const res = await fetch('/users/me', {
           headers: {
             Authorization: `Bearer ${token}`
@@ -210,6 +213,7 @@
     const goCreateBlog = () => {
       window.location.href = 'blog.html';
     };
+  
   </script>
 </body>
 </html>

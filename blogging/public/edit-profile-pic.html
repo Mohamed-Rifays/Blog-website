@@ -183,10 +183,14 @@
   </div>
 
   <script>
-    const token = localStorage.getItem('token');
-    if (!token) window.location.href = '/login.html';
+    
 
     async function loadUser() {
+      const token = localStorage.getItem('token');
+      if (!token){ 
+        window.location.href = '/login.html';
+        return;
+      }
       const res = await fetch('/users/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
