@@ -160,7 +160,7 @@
   </div>
 
   <!-- Main -->
-  <div class="main">
+  <div class="main" id="main" style="display: none;">
     <div class="container">
       <section class="post-form">
         <h2>Create a new post</h2>
@@ -195,10 +195,13 @@
 </div>
 
 <script>
+  const main = document.getElementById('main');
    const token = localStorage.getItem('token');
    if (!token) {
       window.location.href='login.html';
-      
+    }
+    else{
+      main.style.display = 'flex';
     }
 
     

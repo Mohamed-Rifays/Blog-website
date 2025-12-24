@@ -132,7 +132,7 @@
   </div>
 
   <!-- MAIN CONTENT -->
-  <div class="main">
+  <div class="main" id="main" style="display: none;">
     <div class="dashboard-card">
       <h1>Dashboard</h1>
 
@@ -151,17 +151,19 @@
   </div>
 
   <script>
-    
-   
-   
-    const fetchUser = async () => {
-      try {
-        const token = localStorage.getItem('token');
+    const main = document.getElementById('main');
+     const token = localStorage.getItem('token');
 
     if (!token) {
       window.location.href = 'login.html';
-      return;
     }
+   else{
+    main.style.display='flex';
+   }
+   
+    const fetchUser = async () => {
+      try {
+       
         const res = await fetch('/users/me', {
           headers: {
             Authorization: `Bearer ${token}`
