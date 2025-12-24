@@ -172,13 +172,14 @@
       const emailInput = document.getElementById('email');
       const passwordInput = document.getElementById('password');
 
+      
+
+    const loadUser = async () => {
       const token = localStorage.getItem('token');
     if (!token) {
       window.location.href = 'login.html';
       return;
     }
-
-    const loadUser = async () => {
       const res = await fetch('/users/me', {
         headers: { Authorization: `Bearer ${token}` }
       });
