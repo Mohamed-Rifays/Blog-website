@@ -24,6 +24,10 @@
     }
 
     .sidebar {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      position: fixed;
       width: 240px;
       background: #111827;
       color: white;
@@ -153,6 +157,8 @@
       }
 
       .sidebar {
+        position: relative;
+        height: auto;
         width: 100%;
         display: flex;
         gap: 10px;

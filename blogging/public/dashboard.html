@@ -20,6 +20,10 @@
 
     /* LEFT SIDEBAR */
     .sidebar {
+      position: fixed;
+      height: 100vh;  /* full height of screen */
+      display: flex;
+      flex-direction: column;
       width: 240px;
       background: #111827;
       color: #fff;
@@ -103,6 +107,8 @@
       }
 
       .sidebar {
+        position: relative;
+        height: auto;
         width: 100%;
         display: flex;
         gap: 10px;
@@ -115,6 +121,10 @@
       }
 
       .dashboard-card {
+        background: #ffffff;
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+        text-align: center;
         padding: 25px;
       }
     }
