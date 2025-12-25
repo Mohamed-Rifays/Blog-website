@@ -198,28 +198,37 @@
 	</div>
 
 	<script>
+		const username = document.getElementById('name');
+		const useremail = document.getElementById('email');
+		const userpassword = document.getElementById('password');
 		document.querySelector('.login-form').addEventListener('submit', async (e) => {
 			e.preventDefault();
+			try{
 
-			const name = name.value.trim();
-			const email = email.value.trim();
-			const password = password.value.trim();
-
-			const req = await fetch('/users', {
-				method: 'POST',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ name, email, password })
-			});
-
-			const res = await req.json();
-
-			if(!req.ok){
-				alert(res.message || 'Signup failed');
-				return;
+				const name = username.value.trim();
+				const email = useremail.value.trim();
+				const password = userpassword.value.trim();
+	
+				const req = await fetch('/users', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ name, email, password })
+				});
+	
+				const res = await req.json();
+	
+				if(!req.ok){
+					alert(res.message || 'Signup failed');
+					return;
+				}
+	
+				localStorage.setItem('token', res.token);
+				window.location.href = 'index.html';
+			}catch(error){
+				console.log(error);
+				
 			}
 
-			localStorage.setItem('token', res.token);
-			window.location.href = 'index.html';
 		});
 	</script>
 

@@ -50,6 +50,7 @@ userrouter.delete('/users/me/avatar',auth, async (req,res)=>{
 });
 
 userrouter.post('/users',async (req,res)=>{
+   console.log('hi');
    
     try{
     const user = new Users(req.body);
@@ -58,7 +59,7 @@ userrouter.post('/users',async (req,res)=>{
      const token = await user.generateAuthToken();
   
         await user.save();
-         sendWelcomeEmail(user.email,user.name);
+        sendWelcomeEmail(user.email,user.name);
 
         res.status(201).send({ user, token });
     }catch(e){

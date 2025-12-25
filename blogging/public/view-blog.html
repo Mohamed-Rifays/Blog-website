@@ -270,7 +270,7 @@ async function loadBlogs() {
   `;
     pageInfo.textContent = `Page ${currentPage}`;
     prevBtn.disabled = currentPage === 1;
-    nextBtn.disabled = blogs.length < limit;
+    nextBtn.disabled = blogs.length <= limit;
 }
 
 prevBtn.addEventListener('click',()=>{
