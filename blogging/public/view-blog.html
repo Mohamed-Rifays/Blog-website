@@ -57,6 +57,8 @@
     .main {
       flex: 1;
       padding: 30px 20px;
+      margin-left: 240px; /* sidebar width */
+      transition: margin-right 0.3s ease;
     }
 
     .container {
@@ -177,6 +179,121 @@
       }
       
     }
+    .blog-comments button{
+      font-size: 15px;
+      margin-top: 10px;
+      padding: 9px;
+      border: none;
+      border-radius: 5px;
+      background-color:#111827;
+      color: white;
+    }
+
+    /* ======= COMMENT PANEL ======= */
+.comment-panel {
+  position: fixed;
+  top: 0;
+  right: -400px;
+  width: 400px;
+  height: 100%;
+  background: #fff;
+  box-shadow: -2px 0 6px rgba(0,0,0,0.2);
+  transition: right 0.3s;
+  display: flex;
+  flex-direction: column;
+  z-index: 2000;
+}
+
+.comment-panel.open {
+  right: 0;
+}
+
+.comment-header {
+  padding: 20px;
+  border-bottom: 1px solid #ddd;
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.comment-header button {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+
+.comment-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.comment {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.comment .avatar {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.comment .comment-content {
+  flex: 1;
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+.comment .comment-meta {
+  font-size: 0.75rem;
+  color: #555;
+}
+
+.comment-footer {
+  padding: 10px 20px;
+  border-top: 1px solid #ddd;
+  display: flex;
+  gap: 10px;
+}
+
+.comment-footer input {
+  flex: 1;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+.comment-footer button {
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  background: #2563eb;
+  color: white;
+  cursor: pointer;
+}
+
+/* Shrink main content when comment panel is open */
+.main.shrink {
+  margin-right: 400px;
+  transition: margin-right 0.3s;
+}
+
+@media (max-width: 768px) {
+  .comment-panel {
+    width: 100%;
+  }
+  .main.shrink {
+    margin-right: 0;
+  }
+}
+
 
   </style>
 </head>
@@ -212,11 +329,31 @@
 
 </div>
 
+<div class="comment-panel" id="commentPanel">
+  <div class="comment-header">
+    Comments
+    <button id="closeComments">&times;</button>
+  </div>
+  <div class="comment-body" id="commentBody">
+    <p>No comments yet.</p>
+  </div>
+  <div class="comment-footer">
+    <input type="text" id="commentInput" placeholder="Add a comment...">
+    <button id="sendComment" onclick="renderComments()">Send</button>
+  </div>
+</div>
+
 <script>
 const sorting = document.getElementById('sort');
 const prevBtn = document.getElementById('prevBtn');
 const nextBtn = document.getElementById('nextBtn');
 const pageInfo = document.getElementById('pageInfo');
+
+const commentPanel = document.getElementById('commentPanel');
+const commentBody = document.getElementById('commentBody');
+const commentInput = document.getElementById('commentInput');
+
+
 
 let currentPage = 1;
 const limit = 5;
@@ -277,13 +414,83 @@ async function loadBlogs() {
         <h2>${blog.title}</h2>
         <h3>${blog.subtitle}</h3>
         <p>${blog.content}</p>
+
+      <div class="blog-comments"> 
+        <button onclick="openComments('${blog._id}')">Comments</button>
       </div>
+</div>
+
+      
     `).join('')}
   `;
     pageInfo.textContent = `Page ${currentPage}`;
     prevBtn.disabled = currentPage === 1;
     nextBtn.disabled = blogs.length <= limit;
 }
+
+let currentBlogId = null;
+const token = localStorage.getItem('token');
+
+
+async function renderComments() {
+  if (!currentBlogId || !commentInput.value.trim()) return;
+  // Mock comments
+  const comments = await fetch(`/blogs/${currentBlogId}/comments`, {
+    method: 'POST',
+    headers: { 
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}` 
+    },
+    body: JSON.stringify({ content: commentInput.value.trim() })
+  });
+  commentInput.value = '';
+  const res = await comments.json();
+  openComments(currentBlogId);
+  console.log(res.content);
+  
+}
+
+async function openComments(blogId) {
+  currentBlogId = blogId;
+  // Mock comments
+  try {
+  const comments = await fetch(`/blogs/${currentBlogId}/comments`, {
+    method: 'GET',
+    headers: { 
+      'content-type': 'application/json',
+      Authorization: `Bearer ${token}` 
+    }
+  });
+  const res = await comments.json();
+
+  if(res.length ===0){
+    commentBody.innerHTML = '<p>No comments yet.</p>';  
+
+  }else{
+    commentBody.innerHTML = res.map(comment => `
+      <div class="comment"> 
+        <img class="avatar" src="/users/${comment.user._id}/avatar"
+         onerror="this.src='https://static.vecteezy.com/system/resources/previews/018/765/757/original/user-profile-icon-in-flat-style-member-avatar-illustration-on-isolated-background-human-permission-sign-business-concept-vector.jpg'">
+        <div class="comment-content">
+          <div class="comment-meta"><strong>${comment.user.name}</strong> • ${new Date(comment.createdAt).toLocaleString()}</div>
+          <div>${comment.content}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+  commentPanel.classList.add('open');
+  document.querySelector('.main').classList.add('shrink');
+  } catch (e) {
+    console.error('Failed to load comments', e);
+  }
+}
+
+
+
+document.getElementById('closeComments').addEventListener('click', () => {
+  commentPanel.classList.remove('open');
+  document.querySelector('.main').classList.remove('shrink');
+});
 
 prevBtn.addEventListener('click',()=>{
   currentPage--;

@@ -1,6 +1,7 @@
 import express from 'express';
 import { userrouter } from './router/user.js';
 import { blogrouter } from './router/blog.js';
+import { commentRouter } from './router/comment.js';
 import mongoose from 'mongoose';
 import cors from 'cors';
 import path from 'path';
@@ -29,6 +30,7 @@ app.get('/', (req, res) => {
 
 app.use(userrouter);
 app.use(blogrouter);
+app.use(commentRouter);
 
 app.listen(port, () => {
   console.log(`Server is up on port ${port}`);
