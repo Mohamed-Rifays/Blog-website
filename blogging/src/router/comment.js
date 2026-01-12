@@ -22,7 +22,7 @@ commentRouter.post('/blogs/:id/comments',auth, async (req, res) => {
 
 commentRouter.get('/blogs/:id/comments',auth, async (req, res) => {
     try {
-        const comments = await comment.find({ blogId: req.params.id }).populate('user', 'name avatar').sort({ createdAt: -1 });
+        const comments = await comment.find({ blogId: req.params.id }).populate('user', 'name avatar').sort({ createdAt: 1 });
         res.send(comments);
     } catch (e) {
         res.status(500).send();
