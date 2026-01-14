@@ -5,7 +5,7 @@ import { auth } from "../middleware/auth.js";
 export const commentRouter = new express.Router();
 
 commentRouter.post('/blogs/:id/comments',auth, async (req, res) => {
-    console.log(req.body);
+    
     
     try {
         const newComment = new comment({
